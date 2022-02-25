@@ -1,0 +1,47 @@
+import Layout from '../../components/layout'
+import { getAllPostIds, getPostData } from '../../lib/posts'
+import Date from '../../components/date'
+import utilStyles from '../../styles/utils.module.css'
+import Head from 'next/head'
+
+export default function Post({ postData }) {
+  return (
+    <Layout>
+      <Head>
+        <title>{postData.title}</title>
+      </Head>
+      <article>
+        <h1 className={utilStyles.headingXl}>{postData.title}</h1>
+        <div className={utilStyles.lightText}>
+          <Date dateString={postData.date} />
+        </div>
+        <div dangerouslySetInnerHTML={{ __html: postData.contentHtml }} />
+      </article>
+    </Layout>
+  )
+}
+
+// 動的なidsというファイルではどんなページを表示するかを決める
+export async function getStaticPaths() {
+  const paths = getAllPostIds()
+  return {
+    paths,
+    fallback: false
+  }
+}
+
+// 
+export async function getStaticProps({ params }) {
+  const postData = await getPostData(params.id)
+  return {
+    props: {
+      postData
+    }
+  }
+}
+
+// dynamic routesをやるためにすべきこと
+// [id].jsを作る そのページ内に書く内容
+// renderする内容 
+// getStaticPaths [id]内にはいつ配列を返す
+// getStaticProps idと一緒に必要なデータを取ってくる
